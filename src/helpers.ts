@@ -4,7 +4,6 @@
 
 import {
   Client,
-  Emoji,
   Guild,
   GuildTextableChannel,
   Invite,
@@ -12,6 +11,7 @@ import {
   Message,
   MessageContent,
   MessageFile,
+  PartialEmoji,
   TextableChannel,
   TextChannel,
 } from "eris";
@@ -139,7 +139,7 @@ export function waitForReaction(
   availableReactions: Reaction[],
   restrictToUserId?: string,
   timeout = 15000
-): Promise<Emoji | null> {
+): Promise<PartialEmoji | null> {
   return new Promise((resolve) => {
     availableReactions.forEach((reaction) => msg.addReaction(reaction).catch(noop));
 
@@ -182,8 +182,16 @@ export function waitForReply(
       if (msg.author && msg.author.id === bot.user.id) return;
       if (restrictToUserId && (!msg.author || msg.author.id !== restrictToUserId)) return;
 
-      clearTimeout(timeoutTimer);
-      resolve(msg);
+      try {
+        bot.getMessage(msg.channel.id, msg.id).then((message) => {
+          clearTimeout(timeoutTimer);
+          resolve(message);
+        });
+      } catch {
+        const message = channel.messages.get(msg.id)!;
+        clearTimeout(timeoutTimer);
+        resolve(message);
+      }
     });
   });
 }

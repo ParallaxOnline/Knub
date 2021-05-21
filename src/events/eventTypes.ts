@@ -7,7 +7,6 @@ import {
   GroupChannel,
   Guild,
   Invite,
-  InviteWithMetadata,
   Member,
   MemberPartial,
   Message,
@@ -145,11 +144,11 @@ export interface KnownEvents {
   };
   inviteCreate: {
     guild: Guild;
-    invite: Invite & InviteWithMetadata;
+    invite: Invite;
   };
   inviteDelete: {
     guild: Guild;
-    invite: Invite & InviteWithMetadata;
+    invite: Invite;
   };
   messageCreate: {
     message: Message;

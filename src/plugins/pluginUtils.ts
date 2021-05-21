@@ -18,10 +18,14 @@ interface PartialMember {
   roles: Member["roles"];
 }
 
-export function getMemberLevel(levels: PermissionLevels, member: PartialMember, guild: Guild): number {
-  if (guild.ownerID === member.id) {
+export function getMemberLevel(levels: PermissionLevels, partialMember: PartialMember, guild: Guild): number {
+  if (guild.ownerID === partialMember.id) {
     return 99999;
   }
+
+  // Due to inconsitencies in Eris caching, fetch the guild member.
+  let member: Member | PartialMember | undefined = guild.members.get(partialMember.id);
+  if (!member) member = partialMember;
 
   for (const [id, level] of Object.entries(levels)) {
     if (member.id === id || (member.roles && member.roles.includes(id))) {
@@ -54,11 +58,8 @@ export function isGlobalBlueprintByContext(
   return true;
 }
 
-export type PluginPublicInterface<T extends AnyPluginBlueprint> = T["public"] extends PluginBlueprintPublicInterface<
-  any
->
-  ? ResolvedPluginBlueprintPublicInterface<T["public"]>
-  : null;
+export type PluginPublicInterface<T extends AnyPluginBlueprint> =
+  T["public"] extends PluginBlueprintPublicInterface<any> ? ResolvedPluginBlueprintPublicInterface<T["public"]> : null;
 
 /**
  * Load JSON config files from a "config" folder, relative to cwd

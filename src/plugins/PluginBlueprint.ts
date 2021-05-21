@@ -104,9 +104,8 @@ type GuildEventListenerBlueprintsHelper<TPluginData extends GuildPluginData<any>
   [K in GuildEvent]: EventListenerBlueprint<TPluginData, K>;
 };
 
-export type AnyGuildEventListenerBlueprint<
-  TPluginData extends GuildPluginData<any>
-> = GuildEventListenerBlueprintsHelper<TPluginData>[keyof GuildEventListenerBlueprintsHelper<TPluginData>];
+export type AnyGuildEventListenerBlueprint<TPluginData extends GuildPluginData<any>> =
+  GuildEventListenerBlueprintsHelper<TPluginData>[keyof GuildEventListenerBlueprintsHelper<TPluginData>];
 
 /**
  * Blueprint for a plugin that can only be loaded in a global context
@@ -137,9 +136,8 @@ type GlobalEventListenerBlueprintsHelper<TPluginData extends GlobalPluginData<an
   [K in ValidEvent]: EventListenerBlueprint<TPluginData, K>;
 };
 
-export type AnyGlobalEventListenerBlueprint<
-  TPluginData extends GlobalPluginData<any>
-> = GlobalEventListenerBlueprintsHelper<TPluginData>[keyof GlobalEventListenerBlueprintsHelper<TPluginData>];
+export type AnyGlobalEventListenerBlueprint<TPluginData extends GlobalPluginData<any>> =
+  GlobalEventListenerBlueprintsHelper<TPluginData>[keyof GlobalEventListenerBlueprintsHelper<TPluginData>];
 
 export type AnyPluginBlueprint = GuildPluginBlueprint<any> | GlobalPluginBlueprint<any>;
 
@@ -154,26 +152,28 @@ type PluginBlueprintCreatorWithName<TBaseBlueprint extends AnyPluginBlueprint> =
   blueprint: TPartialBlueprint
 ) => TPartialBlueprint & { name: string };
 
-type PluginBlueprintCreator<TBaseBlueprint extends AnyPluginBlueprint> = PluginBlueprintCreatorIdentity<
-  TBaseBlueprint
-> &
-  PluginBlueprintCreatorWithName<TBaseBlueprint>;
+type PluginBlueprintCreator<TBaseBlueprint extends AnyPluginBlueprint> =
+  PluginBlueprintCreatorIdentity<TBaseBlueprint> & PluginBlueprintCreatorWithName<TBaseBlueprint>;
 
 function plugin<TBlueprint extends AnyPluginBlueprint>(...args) {
-  if (args.length === 1) {
-    // (blueprint)
-    // Return blueprint
-    return args[0];
-  } else if (args.length === 2) {
-    // (name, blueprint)
-    // Return blueprint
-    return {
-      ...args[1],
-      name: args[0],
-    };
-  } else if (args.length === 0) {
-    // No arguments, with TPluginType - return self
-    return plugin as PluginBlueprintCreator<TBlueprint>;
+  switch (args.length) {
+    case 0: {
+      // No arguments, with TPluginType - return self
+      return plugin as PluginBlueprintCreator<TBlueprint>;
+    }
+    case 1: {
+      // (blueprint)
+      // Return blueprint
+      return args[0];
+    }
+    case 2: {
+      // (name, blueprint)
+      // Return blueprint
+      return {
+        ...args[1],
+        name: args[0],
+      };
+    }
   }
 
   throw new Error(`No signature of plugin() takes ${args.length} arguments`);

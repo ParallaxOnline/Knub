@@ -76,40 +76,45 @@ type CommandBlueprintCreator<TPluginData extends AnyPluginData<any>> =
   & CommandBlueprintCreatorWithOptions<TPluginData>;
 
 function command<TPluginData extends AnyPluginData<BasePluginType>>(...args) {
-  if (args.length === 1) {
-    // (blueprint)
-    // Return command blueprint
-    return args[0];
-  }
-  if (args.length === 2) {
-    // (trigger, run)
-    // Return command blueprint
-    return {
-      trigger: args[0],
-      run: args[1],
-      permission: null,
-    };
-  } else if (args.length === 3) {
-    // (trigger, signature, run)
-    // Return command blueprint
-    return {
-      trigger: args[0],
-      signature: args[1],
-      run: args[2],
-      permission: null,
-    };
-  } else if (args.length === 4) {
-    // (trigger, signature, options, run)
-    // Return command blueprint
-    return {
-      ...args[2],
-      trigger: args[0],
-      signature: args[1],
-      run: args[3],
-    };
-  } else if (args.length === 0) {
-    // No arguments, with TPluginType - return self
-    return command as CommandBlueprintCreator<TPluginData>;
+  switch (args.length) {
+    case 0: {
+      // No arguments, with TPluginType - return self
+      return command as CommandBlueprintCreator<TPluginData>;
+    }
+    case 1: {
+      // (blueprint)
+      // Return command blueprint
+      return args[0];
+    }
+    case 2: {
+      // (trigger, run)
+      // Return command blueprint
+      return {
+        trigger: args[0],
+        run: args[1],
+        permission: null,
+      };
+    }
+    case 3: {
+      // (trigger, signature, run)
+      // Return command blueprint
+      return {
+        trigger: args[0],
+        signature: args[1],
+        run: args[2],
+        permission: null,
+      };
+    }
+    case 4: {
+      // (trigger, signature, options, run)
+      // Return command blueprint
+      return {
+        ...args[2],
+        trigger: args[0],
+        signature: args[1],
+        run: args[3],
+      };
+    }
   }
 
   throw new Error(`No signature of command() takes ${args.length} arguments`);

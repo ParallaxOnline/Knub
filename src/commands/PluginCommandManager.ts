@@ -83,9 +83,7 @@ export class PluginCommandManager<TPluginData extends AnyPluginData<any>> {
       pluginData: this.pluginData!,
     });
 
-    if (!command) {
-      return;
-    }
+    if (!command) return;
 
     if (isError(command)) {
       const usageLine = getCommandSignature(command.command);
